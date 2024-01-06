@@ -38,11 +38,12 @@ class CategoryList(MethodView):
     @blp.arguments(CategorySchema)
     @blp.response(200, CategorySchema)
     def post(self, category_data):
-        if not db.session.query(db.exists().where(UserModel.id == category_data["user_id"])).scalar():
-            abort(
-                400,
-                message="This user are not exist"
-            )
+        if "user_id" in category_data:
+            if not db.session.query(db.exists().where(UserModel.id == category_data["user_id"])).scalar():
+                abort(
+                    400,
+                    message="This user are not exist"
+                )
         category = CategoryModel(**category_data)
         try:
             db.session.add(category)

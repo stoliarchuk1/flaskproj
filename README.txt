@@ -1,4 +1,4 @@
-https://lab2-uki7.onrender.com
+https://flaskproj.onrender.com
 
 # Розробка базового REST API для обліку витрат
 
