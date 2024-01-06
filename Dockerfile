@@ -1,11 +1,14 @@
-FROM python:3.10
+FROM python:3.10.6-slim
 
-WORKDIR /flaskproj
+ENV FLASK_APP=flaskproj
+ENV FLASK_DEBUG=$FLASK_DEBUG
 
-COPY requirements.txt .
+COPY requirements.txt /opt
 
-RUN python -m pip install -r requirements.txt
+RUN python3 -m pip install -r /opt/requirements.txt
 
-COPY . /flaskproj
+COPY flaskproj /opt/flaskproj
 
-CMD flask --app flaskproj run -h 0.0.0.0 -p $PORT
+WORKDIR /opt
+
+CMD flask run --host 0.0.0.0 -p $PORT

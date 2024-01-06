@@ -6,7 +6,9 @@ services:
    build:
      context: .
      dockerfile: Dockerfile
+   volumes: ["./flaskproj:/opt/flaskproj"]
    environment:
      PORT: "5000"
+     FLASK_DEBUG: "true"
    ports:
      - "5000:8080"
