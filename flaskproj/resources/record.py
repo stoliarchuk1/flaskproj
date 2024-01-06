@@ -7,6 +7,7 @@ from flaskproj.models.record import RecordModel
 from flaskproj.models.category import CategoryModel
 from flaskproj.models.user import UserModel
 from flaskproj.schemas import RecordSchema, RecordQuerySchema
+from flask_jwt_extended import jwt_required
 
 blp = Blueprint("record", __name__, description="Operations on record")
 
@@ -14,6 +15,7 @@ blp = Blueprint("record", __name__, description="Operations on record")
 @blp.route("/record/<string:record_id>")
 class Record(MethodView):
     @blp.response(200, RecordSchema)
+    @jwt_required()
     def get(self, record_id):
         record = RecordModel.query.get_or_404(record_id)
         return record
@@ -24,6 +26,7 @@ class RecordList(MethodView):
 
     @blp.arguments(RecordQuerySchema, location="query", as_kwargs=True)
     @blp.response(200, RecordSchema(many=True))
+    @jwt_required()
     def get(self, **kwargs):
         user_id = kwargs.get("user_id")
 
@@ -42,6 +45,7 @@ class RecordList(MethodView):
 
     @blp.arguments(RecordSchema)
     @blp.response(200, RecordSchema)
+    @jwt_required()
     def post(self, record_data):
         if not db.session.query(db.exists().where(UserModel.id == record_data["user_id"])).scalar():
             abort(

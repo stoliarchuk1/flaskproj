@@ -4,9 +4,9 @@ from flask.views import MethodView
 from flask_smorest import abort
 from flaskproj.db import db
 from sqlalchemy.exc import IntegrityError
-
 from flaskproj.models import CategoryModel, UserModel
 from flaskproj.schemas import CategorySchema, CategoryQuerySchema
+from flask_jwt_extended import jwt_required
 
 blp = Blueprint("category", __name__, description="Operations on category")
 
@@ -15,6 +15,7 @@ blp = Blueprint("category", __name__, description="Operations on category")
 class Category(MethodView):
 
     @blp.response(200, CategorySchema)
+    @jwt_required()
     def get(self, category_id):
         category = CategoryModel.query.get_or_404(category_id)
         return category
@@ -25,6 +26,7 @@ class CategoryList(MethodView):
 
     @blp.arguments(CategoryQuerySchema, location="query", as_kwargs=True)
     @blp.response(200, CategorySchema(many=True))
+    @jwt_required()
     def get(self, **kwargs):
         user_id = kwargs.get("user_id", None)
 
@@ -37,6 +39,7 @@ class CategoryList(MethodView):
 
     @blp.arguments(CategorySchema)
     @blp.response(200, CategorySchema)
+    @jwt_required()
     def post(self, category_data):
         if "user_id" in category_data:
             if not db.session.query(db.exists().where(UserModel.id == category_data["user_id"])).scalar():
