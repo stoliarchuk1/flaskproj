@@ -3,7 +3,6 @@ from flaskproj import app
 import uuid
 from datetime import datetime
 
-
 CATEGORIES = [
     {
         "id": 1,
@@ -15,6 +14,16 @@ USERS = [
     {
         "id": 1,
         "name": "Kolyan"
+    }
+]
+
+RECORDS = [
+    {
+        "id": 1,
+        "user_id": 1,
+        "category_id": 1,
+        "data_and_time": "123",
+        "currency": 123
     }
 ]
 
@@ -78,3 +87,60 @@ def get_user_by_id(user_id):
     return jsonify(user)
 
 
+@app.route("/records")
+def get_records():
+    return jsonify({"records": RECORDS})
+
+
+@app.route("/record", methods=['POST'])
+def create_record():
+    request_data = request.get_json()
+    record_id = str(uuid.uuid4())
+    RECORDS.append({"id": record_id,
+                    "user_id": request_data["user_id"],
+                    "category_id": request_data["category_id"],
+                    "date_and_time": datetime.now(),
+                    "currency": request_data["currency"]})
+    return jsonify(request_data)
+
+
+@app.route("/record/<record_id>", methods=["DELETE"])
+def delete_record(record_id):
+    for i in RECORDS:
+        if i['id'] == int(record_id):
+            deleted_record = i
+            break
+    USERS.remove(deleted_record)
+    return jsonify(deleted_record)
+
+
+@app.route("/record")
+def get_record():
+    request_data = request.get_json()
+    records = []
+    try:
+        category_id = request_data['category_id']
+        user_id = request_data['user_id']
+    except:
+        try:
+            category_id = request_data['category_id']
+        except:
+            try:
+                user_id = request_data['user_id']
+            except:
+                records = {"Error": "no one args"}
+            else:
+                records = []
+                for i in RECORDS:
+                    if i["user_id"] == user_id:
+                        records.append(i)
+        else:
+            for i in RECORDS:
+                if i["category_id"] == category_id:
+                    records.append(i)
+    else:
+        for i in RECORDS:
+            if i["user_id"] == user_id & i["category_id"] == category_id:
+                records.append(i)
+    finally:
+        return jsonify(records)
