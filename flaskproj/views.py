@@ -11,7 +11,12 @@ CATEGORIES = [
     }
 ]
 
-USERS = []
+USERS = [
+    {
+        "id": 1,
+        "name": "Kolyan"
+    }
+]
 
 
 # GET /categories
@@ -41,7 +46,35 @@ def delete_category():
     return jsonify(deleted_category)
 
 
-@app.route("/categories")
-def get_categories():
-    return jsonify({"categories": CATEGORIES})
+@app.route("/users")
+def get_users():
+    return jsonify({"users": USERS})
+
+
+@app.route("/user", methods=['POST'])
+def create_user():
+    request_data = request.get_json()
+    user_id = str(uuid.uuid4())
+    USERS.append({"id": user_id, "name": request_data["name"]})
+    return jsonify(request_data)
+
+
+@app.route("/user/<user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    for i in USERS:
+        if i['id'] == int(user_id):
+            deleted_user = i
+            break
+    USERS.remove(deleted_user)
+    return jsonify(deleted_user)
+
+
+@app.route("/user/<user_id>")
+def get_user_by_id(user_id):
+    for i in USERS:
+        if i['id'] == int(user_id):
+            user = i
+            break
+    return jsonify(user)
+
 
